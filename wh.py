@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals 
 from collections import OrderedDict
 
 class Skill(object):
-	def __init__(self, name, label, description=None, specialized=False, speciality=None):
-		self.name  = name
+	def __init__(self, id_, label, description=None, specialized=False, speciality=None):
+		self.id_  = id_
 		self.label = label
 		self.description = description or "";
 		self.specialized = specialized or (speciality is not None)
@@ -15,27 +16,30 @@ class Skill(object):
 	def __str__(self):
 		res = "" 
 		res += self.label
-		res += "["+self.name+"]"
+		res += "["+self.id_+"]"
 		if self.specialized:
 			res += '('
 			if self.speciality is not None:
 				res += self.speciality
 			else:
-				res += u"au choix"
+				res += "au choix"
 			res += ')'
 		return unicode(res)
 
-SKILLS = {
-		'com': Skill('com', u"Commérages"),
-		'cac': Skill('cac', u"Connaissances Académiques", specialized=True),
-		'cge': Skill('cge', u"Connaissances Générales", specialized=True),
-		}
+SKILL_LIST = [
+	Skill('com', "Commérages"),
+	Skill('cac', "Connaissances Académiques", specialized=True),
+	Skill('cge', "Connaissances Générales", specialized=True),
+		]
+SKILLS = {}
+for skill in SKILL_LIST:
+	SKILLS[skill.id_] = skill
 
 
 
 class Talent(object):
-	def __init__(self, name, label, description=None):
-		self.name  = name
+	def __init__(self, id_, label, description=None):
+		self.id_  = id_
 		self.label = label
 		self.description = "";
 		self.careers = [] #redundancy? Career.talents
@@ -43,8 +47,8 @@ class Talent(object):
 	def __str__(self):
 		res = "" 
 		res += self.label
-		res += "["+self.name+"]"
-		return res
+		res += "["+self.id_+"]"
+		return unicode(res)
 
 
 class Modifier(object):
@@ -59,26 +63,30 @@ TALENTS = {
 
 
 class Trait(object):
-	def __init__(self, name, label, primary=True):
-		self.name  = name;
+	def __init__(self, id_, label, primary=True):
+		self.id_  = id_;
 		self.label = label;
 		self.primary = primary
 
-PROFILE = {
-			# primary: +5%/+1
-			'CC':  Trait('CC', u"Capacité de Combat"),
-			'CT':  Trait('CT', u"Capacité de Tir"),
-			'F':   Trait('For',u"Force"),
-			'E':   Trait('Res',u"Résistance"),
-			'Ag':  Trait('Ag', u"Agilité"),
-			'Int': Trait('Int',u"Intelligence"),
-			'FM':  Trait('FM', u"Force Mentale"),
-			'Soc': Trait('Soc',u"Sociabilité"),
-			# secondary: +1/+1
-			'A':   Trait('A',  u"Attaques",  False),
-			'B':   Trait('B',  u"Blessures", False),
-			'Mag': Trait('Mag',u"Magie",     False),
-		}
+
+TRAITS = [
+	# primary: +5%/+1
+	Trait('CC', "Capacité de Combat"),
+	Trait('CT', "Capacité de Tir"),
+	Trait('F',  "Force"),
+	Trait('E',  "Résistance"),
+	Trait('Ag', "Agilité"),
+	Trait('Int',"Intelligence"),
+	Trait('FM', "Force Mentale"),
+	Trait('Soc',"Sociabilité"),
+	# secondary: +1/+1
+	Trait('A',  "Attaques",  False),
+	Trait('B',  "Blessures", False),
+	Trait('Mag',"Magie",     False),
+		]
+PROFILE = {}
+for trait in TRAITS:
+	PROFILE[trait.id_] = trait
 
 def profile2str(profile):
 	res = ''
@@ -102,9 +110,9 @@ def complete(dst, src, general_index, errors, message):
 				errors.append("\""+key+"\" is not a valid "+message+" identifier.")
 
 class Career(object):
-	def __init__(self, name, label, description=None, advanced=False, profile=None, skills=None, talents=None, from_=None, next_=None):
+	def __init__(self, id_, label, description=None, advanced=False, profile=None, skills=None, talents=None, before=None, after=None):
 		errors = []
-		self.name  = name
+		self.id_  = id_
 		self.label = label
 		self.description = description or ""
 		self.advanced = advanced
@@ -121,7 +129,7 @@ class Career(object):
 		self.profile['B']   = 0
 		self.profile['Mag'] = 0
 		profile = profile or {}
-		for k,v in profile.iteritems():
+		for k,v in profile.items():
 			try:
 				trait = PROFILE[k]
 				if trait.primary:
@@ -138,40 +146,40 @@ class Career(object):
 		self.talents  = []
 		complete(self.talents, talents, TALENTS, errors, "talent")
 		talents = talents or []
-		self.from_ = []
-		complete(self.from_, from_, CAREERS, errors, "career")
-		self.next_ = []
-		complete(self.next_, next_, CAREERS, errors, "career")
+		self.before = []
+		complete(self.before, before, CAREERS, errors, "career")
+		self.after = []
+		complete(self.after, after, CAREERS, errors, "career")
 		if len(errors) > 0:
 			print("Career \""+label+"\":\n - "+"\n - ".join(errors))
 
 	def __str__(self):
 		res = "" 
 		res += self.label
-		res += "["+self.name+"]"
-		res += u"(carrière "
+		res += "["+self.id_+"]"
+		res += "(carrière "
 		if self.advanced:
-			res += u"avancée)\n"
+			res += "avancée)\n"
 		else:
-			res += u"de base)\n"
+			res += "de base)\n"
 		if (len(self.description) > 0):
 			res += self.description+'\n'
 		res += profile2str(self.profile)+'\n'
-		res += u"Compétences ("+str(len(self.skills))+"): "
-		for name in self.skills:
-			skill = SKILLS[name]
+		res += "Compétences ("+str(len(self.skills))+"): "
+		for id_ in self.skills:
+			skill = SKILLS[id_]
 			res += unicode(skill)+", "
 		if len(self.skills) is 0:
-			res += u"Aucune"
+			res += "Aucune"
 		else:
 			res = res[:-2]
 		res += '\n'
-		res += u"Talents ("+str(len(self.talents))+"): "
-		for name in self.talents:
-			talents = TALENTS[name]
+		res += "Talents ("+str(len(self.talents))+"): "
+		for id_ in self.talents:
+			talents = TALENTS[id_]
 			res += unicode(talent)
 		if len(self.talents) is 0:
-			res += u"Aucun"
+			res += "Aucun"
 		res += '\n'
 		return unicode(res)
 
@@ -180,6 +188,6 @@ class Career(object):
 
 
 if __name__ == '__main__':
-	career = Career('bat', u"Avoué", profile={'CC':0,'CT':15,'E':5,'B':2, 'TIR':66, 'Soc': 7}, skills=['com','cca','cge'])
-	print(u"Carrière: "+unicode(career));
+	career = Career('avé', "Avoué", profile={'CC':0,'CT':15,'E':5,'B':2, 'TIR':66, 'Soc': 7}, skills=['com','cca','cge'])
+	print("Carrière: "+unicode(career));
 
