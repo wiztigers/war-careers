@@ -20,7 +20,7 @@ SKILL_LIST = [
 	Skill('cac', "Connaissances Académiques", specialized=True),
 	Skill('cge', "Connaissances Générales", specialized=True),
 		]
-SKILLS = {}
+SKILLS = OrderedDict()
 for skill in SKILL_LIST:
 	SKILLS[skill.id_] = skill
 
@@ -39,8 +39,7 @@ class Modifier(object):
 		self.carac = None
 		self.skill = None
 
-TALENTS = {
-		}
+TALENTS = OrderedDict()
 
 
 
@@ -70,7 +69,7 @@ PROFILE = OrderedDict()
 for trait in TRAITS:
 	PROFILE[trait.id_] = trait
 
-CAREERS = { }
+CAREERS = OrderedDict()
 
 def complete(dst, src, general_index, errors, message):
 		src = src or []
@@ -131,8 +130,6 @@ class Career(object):
 
 if __name__ == '__main__':
 	writer = ConsoleToString(SKILLS, TALENTS, CAREERS)
-	skill = Skill('cac', "Connaissances Académiques", specialized=True)
-	print("Compétence: "+writer.tostring(skill))
 	career = Career('avé', "Avoué", profile={'CC':0,'CT':15,'E':5,'B':2, 'TIR':66, 'Soc': 7}, skills=['com','cca','cge'])
 	print("Carrière: "+writer.tostring(career))
 
