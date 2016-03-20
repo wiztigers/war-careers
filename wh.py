@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
-from __future__ import unicode_literals 
+from tostring import ConsoleToString
 from collections import OrderedDict
 
 class Skill(object):
@@ -13,18 +14,6 @@ class Skill(object):
 		self.careers = [] #redundancy? Career.skills
 		self.talents = [] #redundancy?
 
-	def __str__(self):
-		res = "" 
-		res += self.label
-		res += "["+self.id_+"]"
-		if self.specialized:
-			res += '('
-			if self.speciality is not None:
-				res += self.speciality
-			else:
-				res += "au choix"
-			res += ')'
-		return unicode(res)
 
 SKILL_LIST = [
 	Skill('com', "Commérages"),
@@ -43,13 +32,6 @@ class Talent(object):
 		self.label = label
 		self.description = "";
 		self.careers = [] #redundancy? Career.talents
-
-	def __str__(self):
-		res = "" 
-		res += self.label
-		res += "["+self.id_+"]"
-		return unicode(res)
-
 
 class Modifier(object):
 	def __init__(self):
@@ -84,18 +66,9 @@ TRAITS = [
 	Trait('B',  "Blessures", False),
 	Trait('Mag',"Magie",     False),
 		]
-PROFILE = {}
+PROFILE = OrderedDict()
 for trait in TRAITS:
 	PROFILE[trait.id_] = trait
-
-def profile2str(profile):
-	res = ''
-	for k in profile.keys():
-		res += '|{:3}'.format(k)
-	res += '|\n---------------------------------------------\n|'
-	for v in profile.values():
-		res += ' {:<2}|'.format(v)
-	return res
 
 CAREERS = { }
 
@@ -153,41 +126,13 @@ class Career(object):
 		if len(errors) > 0:
 			print("Career \""+label+"\":\n - "+"\n - ".join(errors))
 
-	def __str__(self):
-		res = "" 
-		res += self.label
-		res += "["+self.id_+"]"
-		res += "(carrière "
-		if self.advanced:
-			res += "avancée)\n"
-		else:
-			res += "de base)\n"
-		if (len(self.description) > 0):
-			res += self.description+'\n'
-		res += profile2str(self.profile)+'\n'
-		res += "Compétences ("+str(len(self.skills))+"): "
-		for id_ in self.skills:
-			skill = SKILLS[id_]
-			res += unicode(skill)+", "
-		if len(self.skills) is 0:
-			res += "Aucune"
-		else:
-			res = res[:-2]
-		res += '\n'
-		res += "Talents ("+str(len(self.talents))+"): "
-		for id_ in self.talents:
-			talents = TALENTS[id_]
-			res += unicode(talent)
-		if len(self.talents) is 0:
-			res += "Aucun"
-		res += '\n'
-		return unicode(res)
-
-
 
 
 
 if __name__ == '__main__':
+	writer = ConsoleToString(SKILLS, TALENTS, CAREERS)
+	skill = Skill('cac', "Connaissances Académiques", specialized=True)
+	print("Compétence: "+writer.tostring(skill))
 	career = Career('avé', "Avoué", profile={'CC':0,'CT':15,'E':5,'B':2, 'TIR':66, 'Soc': 7}, skills=['com','cca','cge'])
-	print("Carrière: "+unicode(career));
+	print("Carrière: "+writer.tostring(career))
 
