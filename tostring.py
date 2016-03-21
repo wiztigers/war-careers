@@ -31,8 +31,10 @@ class ConsoleToString(object):
 		res += "["+skill.id_+"]"
 		if skill.specialized:
 			res += '('
-			if skill.speciality is not None:
-				res += skill.speciality
+			if len(skill.speciality) > 0:
+				for spe in skill.speciality:
+					res += spe + ", "
+				res = res[:-2]
 			else:
 				res += "au choix"
 			res += ')'
@@ -42,7 +44,29 @@ class ConsoleToString(object):
 		res = "" 
 		res += talent.label
 		res += "["+talent.id_+"]"
+		if len(talent.modifiers) > 0:
+			res += " Compétences liées: ["
+			for m in talent.modifiers:
+				res += self.modifier2string(m) + ", "
+			res = res[:-2]
+			res += "]"
 		return _tostring(res)
+
+	def modifier2string(self, modifier):
+		res = ""
+		if modifier.trait is not None:
+			res += modifier.trait
+		elif modifier.skill is not None:
+			res += modifier.skill
+		else:
+			res += '?'
+		if modifier.value >= 0:
+			res += "+"
+		res += _tostring(modifier.value)
+		res += ' '
+		if modifier.condition is not None:
+			res += modifier.condition
+		return res
 
 	def career2string(self, career):
 		res = "" 

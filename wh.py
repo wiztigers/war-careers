@@ -5,41 +5,38 @@ from tostring import ConsoleToString
 from collections import OrderedDict
 
 class Skill(object):
-	def __init__(self, id_, label, description=None, specialized=False, speciality=None):
+	def __init__(self, id_, label, trait=None, description=None, specialized=False, speciality=None, advanced=False):
 		self.id_  = id_
 		self.label = label
+		self.trait = trait
 		self.description = description or "";
 		self.specialized = specialized or (speciality is not None)
-		self.speciality = None
+		self.speciality = speciality or []
+		if isinstance(self.trait, list):
+			if len(self.trait) != len(self.speciality):
+				print("ERROR: Skill \""+label+"["+id_+"]: speciality:trait mismatch.")
+		self.advanced = advanced
 		self.careers = [] #redundancy? Career.skills
 		self.talents = [] #redundancy?
 
 
-SKILL_LIST = [
-	Skill('com', "Commérages"),
-	Skill('cac', "Connaissances Académiques", specialized=True),
-	Skill('cge', "Connaissances Générales", specialized=True),
-		]
-SKILLS = OrderedDict()
-for skill in SKILL_LIST:
-	SKILLS[skill.id_] = skill
-
-
 
 class Talent(object):
-	def __init__(self, id_, label, description=None):
+	def __init__(self, id_, label, description=None, modifiers=None, specialized=False, speciality=None):
 		self.id_  = id_
 		self.label = label
-		self.description = "";
+		self.description = "" or description;
+		self.specialized = specialized or (speciality is not None)
+		self.speciality = speciality or []
+		self.modifiers = modifiers or []
 		self.careers = [] #redundancy? Career.talents
 
 class Modifier(object):
-	def __init__(self):
-		self.condition = None
-		self.carac = None
-		self.skill = None
-
-TALENTS = OrderedDict()
+	def __init__(self, value, trait, skill, condition=None):
+		self.trait = trait
+		self.skill = skill
+		self.value = value
+		self.condition = condition
 
 
 
@@ -69,17 +66,7 @@ PROFILE = OrderedDict()
 for trait in TRAITS:
 	PROFILE[trait.id_] = trait
 
-CAREERS = OrderedDict()
 
-def complete(dst, src, general_index, errors, message):
-		src = src or []
-		errors = errors or []
-		for key in src:
-			try:
-				general_index[key]
-				dst.append(key)
-			except KeyError:
-				errors.append("\""+key+"\" is not a valid "+message+" identifier.")
 
 class Career(object):
 	def __init__(self, id_, label, description=None, advanced=False, profile=None, skills=None, talents=None, before=None, after=None):
@@ -114,22 +101,20 @@ class Career(object):
 				errors.append("\""+k+"\" is not a valid profile item.")
 		self.skills  = []
 		skills = skills or []
-		complete(self.skills, skills, SKILLS, errors, "skill")
+		for key in skills:
+			self.skills.append(key)
 		self.talents  = []
-		complete(self.talents, talents, TALENTS, errors, "talent")
 		talents = talents or []
+		for key in talents:
+			self.talents.append(key)
 		self.before = []
-		complete(self.before, before, CAREERS, errors, "career")
+		before = before or []
+		for key in before:
+			self.before.append(key)
 		self.after = []
-		complete(self.after, after, CAREERS, errors, "career")
+		after = after or []
+		for key in after:
+			self.after.append(key)
 		if len(errors) > 0:
 			print("Career \""+label+"\":\n - "+"\n - ".join(errors))
-
-
-
-
-if __name__ == '__main__':
-	writer = ConsoleToString(SKILLS, TALENTS, CAREERS)
-	career = Career('avé', "Avoué", profile={'CC':0,'CT':15,'E':5,'B':2, 'TIR':66, 'Soc': 7}, skills=['com','cca','cge'])
-	print("Carrière: "+writer.tostring(career))
 
