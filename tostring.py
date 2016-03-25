@@ -86,9 +86,13 @@ class ConsoleToString(object):
 			res += career.description+'\n'
 		res += self.profile2string(career.profile)+'\n'
 		res += "Compétences ("+str(len(career.skills))+"): "
-		for id_ in career.skills:
-			skill = self.SKILLS[id_]
-			res += self.skill2string(skill)+", "
+		for item in career.skills:
+			if item.__class__.__name__ == 'Skill':
+				res += self.skill2string(item)+", "
+			else:
+				for skill in item:
+					res += self.skill2string(skill)+" ou "
+				res = res[:-4]+", "
 		if len(career.skills) is 0:
 			res += "Aucune"
 		else:
