@@ -23,6 +23,8 @@ class ConsoleToString(object):
 			return self.talent2string(x)
 		if x.__class__.__name__ == 'Career':
 			return self.career2string(x)
+		if x.__class__.__name__ == 'Source':
+			return self.source2string(x)
 		raise Exception("Unsupported type "+x.__class__.__name__)
 
 	def skill2string(self, skill):
@@ -74,9 +76,12 @@ class ConsoleToString(object):
 		res += "["+career.id_+"]"
 		res += "(carrière "
 		if career.advanced:
-			res += "avancée)\n"
+			res += "avancée)"
 		else:
-			res += "de base)\n"
+			res += "de base)"
+		if career.source is not None:
+			res += ' '+self.source2string(career.source)
+		res += '\n'
 		if (len(career.description) > 0):
 			res += career.description+'\n'
 		res += self.profile2string(career.profile)+'\n'
@@ -91,12 +96,15 @@ class ConsoleToString(object):
 		res += '\n'
 		res += "Talents ("+str(len(career.talents))+"): "
 		for id_ in career.talents:
-			talents = self.TALENTS[id_]
+			talent = self.TALENTS[id_]
 			res += self.talent2string(talent)
 		if len(career.talents) is 0:
 			res += "Aucun"
 		res += '\n'
 		return _tostring(res)
+
+	def source2string(self, source):
+		return "[%s, page %s]"%(source.document, source.page)
 
 	def profile2string(self, profile):
 		res = ''
@@ -107,4 +115,47 @@ class ConsoleToString(object):
 			res += ' {:<2}|'.format(v)
 		return res
 
+
+
+class PythonToString(object):
+	def __init__(self, skills, talents, careers):
+		self.SKILLS  = skills
+		self.TALENTS = talents
+		self.CAREERS = careers
+
+	def tostring(self, x):
+		if x.__class__.__name__ == 'Career':
+			return self.career2string(x)
+		if x.__class__.__name__ == 'Source':
+			return self.source2string(x)
+		raise Exception("Unsupported type "+x.__class__.__name__)
+
+	def career2string(self, career):
+		res = "Career('%s', \"%s\", advanced=%s"%(career.id_, career.label, career.advanced)
+		res += ",\nprofile=%s"%(self.profile2string(career.profile))
+		res += ",\nskills=%s"%(career.skills)
+		res += ",\ntalents=%s"%(career.talents)
+		res += ",\nbefore=%s"%(career.before)
+		res += ",\nafter=%s"%(career.after)
+		if career.description is not None:
+			res += ",\ndescription=\"%s\""%(career.description)
+		if career.source is not None:
+			res += ",\nsource=%s"%(self.source2string(career.source))
+		return res+"),\n"
+
+	def source2string(self, source):
+		return 'Source("%s", %s)'%(source.document, source.page)
+
+	def profile2string(self, profile):
+		res = "{ "
+		for k,v in profile.items():
+			if v > 0:
+				res += "'%s':%s,"%(k,v)
+		return res + " }"
+
+	def idlist2string(self, ids):
+		res = "[ "
+		for i in ids:
+			res += "'%s',"%(i)
+		return res + " ]"
 

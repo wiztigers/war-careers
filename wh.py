@@ -4,6 +4,18 @@ from __future__ import unicode_literals
 from tostring import ConsoleToString
 from collections import OrderedDict
 
+SOURCES = {
+	'core': "Warhammer (2nde édition)",
+	'comp': "Le Compagnon (2nde édition)",
+	'magi': "Les Royaumes de sorcellerie (2nde édition)",
+	'sigm': "Les Héritiers de Sigmar (2nde édition)",
+}
+
+class Source(object):
+	def __init__(self, document, page):
+		self.document = document
+		self.page = page
+
 class Skill(object):
 	def __init__(self, id_, label, trait=None, description=None, specialized=False, speciality=None, advanced=False):
 		self.id_  = id_
@@ -60,7 +72,12 @@ TRAITS = [
 	# secondary: +1/+1
 	Trait('A',  "Attaques",  False),
 	Trait('B',  "Blessures", False),
+	Trait('BF', "Bonus de Force",    False),
+	Trait('BE', "Bonus d'Endurance", False),
+	Trait('M',  "Mouvement", False),
 	Trait('Mag',"Magie",     False),
+	Trait('PF', "Points de Focalisation", False),
+	Trait('PD', "Points de Destin", False),
 		]
 PROFILE = OrderedDict()
 for trait in TRAITS:
@@ -69,24 +86,21 @@ for trait in TRAITS:
 
 
 class Career(object):
-	def __init__(self, id_, label, description=None, advanced=False, profile=None, skills=None, talents=None, before=None, after=None):
+	def __init__(self, id_, label, description=None, source=None, advanced=False, profile=None, skills=None, talents=None, before=None, after=None):
 		errors = []
 		self.id_  = id_
 		self.label = label
 		self.description = description or ""
+		self.source = source
+		if self.source is not None:
+			try:
+				SOURCES[self.source.document]
+			except KeyError:
+				errors.append("Book \""+self.source.document+"\" is not referenced.")
 		self.advanced = advanced
 		self.profile = OrderedDict()
-		self.profile['CC']  = 0
-		self.profile['CT']  = 0
-		self.profile['F']   = 0
-		self.profile['E']   = 0
-		self.profile['Ag']  = 0
-		self.profile['Int'] = 0
-		self.profile['FM']  = 0
-		self.profile['Soc'] = 0
-		self.profile['A']   = 0
-		self.profile['B']   = 0
-		self.profile['Mag'] = 0
+		for k,v in PROFILE.items():
+			self.profile[k] = 0
 		profile = profile or {}
 		for k,v in profile.items():
 			try:
