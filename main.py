@@ -103,11 +103,9 @@ from tostring import ConsoleToString, PythonToString
 
 if __name__ == '__main__':
 	writer = ConsoleToString(SKILLS, TALENTS, CAREERS)
-	for k,v in SKILLS.items():
-		continue
+#	for k,v in SKILLS.items():
 #		print("Compétence: "+writer.tostring(v))
-	for k,v in TALENTS.items():
-		continue
+#	for k,v in TALENTS.items():
 #		print("Talent: "+writer.tostring(v))
 	for k,v in CAREERS.items():
 		validate_career(v)

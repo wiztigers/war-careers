@@ -9,6 +9,7 @@ SOURCES = {
 	'comp': "Le Compagnon (2nde édition)",
 	'magi': "Les Royaumes de sorcellerie (2nde édition)",
 	'sigm': "Les Héritiers de Sigmar (2nde édition)",
+	'glac': "La Reine des Glaces (2nde édition)",
 }
 
 class Source(object):
