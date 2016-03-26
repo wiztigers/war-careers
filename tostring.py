@@ -10,6 +10,12 @@ def _tostring(expr):
 	else:
 		return unicode(expr)
 
+def _isstring(o):
+	if PYTHON3:
+		return type(o) is str
+	else:
+		return type(o) is unicode
+
 class ConsoleToString(object):
 	def __init__(self, skills, talents, careers):
 		self.SKILLS  = skills
@@ -27,7 +33,10 @@ class ConsoleToString(object):
 			return self.source2string(x)
 		raise Exception("Unsupported type "+x.__class__.__name__)
 
-	def skill2string(self, skill):
+	def skill2string(self, o):
+		return self.unwrapped(o, 'Skill', self._skill2string)
+
+	def _skill2string(self, skill):
 		res = "" 
 		res += skill.label
 		res += "["+skill.id_+"]"
@@ -42,16 +51,34 @@ class ConsoleToString(object):
 			res += ')'
 		return _tostring(res)
 
-	def talent2string(self, talent):
+	def talent2string(self, o):
+		return self.unwrapped(o, 'Talent', self._talent2string)
+
+	def unwrapped(self, o, type_, tostringmethod):
+		res = ""
+		if type(o).__name__ == type_:
+			res += tostringmethod(o)
+		elif type(o) is list:
+			for item in o:
+				res += self.unwrapped(item, type_, tostringmethod)+" ou "
+			res = res[:-4]
+		else:
+			raise Exception("Unsupported "+type_+" type: "+o.__class__.__name__)
+		return res
+
+	def _talent2string(self, talent):
 		res = "" 
 		res += talent.label
 		res += "["+talent.id_+"]"
-		if len(talent.modifiers) > 0:
-			res += " Compétences liées: ["
-			for m in talent.modifiers:
-				res += self.modifier2string(m) + ", "
-			res = res[:-2]
-			res += "]"
+		if talent.specialized:
+			res += '('
+			if len(talent.speciality) > 0:
+				for spe in talent.speciality:
+					res += spe + ", "
+				res = res[:-2]
+			else:
+				res += "au choix"
+			res += ')'
 		return _tostring(res)
 
 	def modifier2string(self, modifier):
@@ -85,25 +112,21 @@ class ConsoleToString(object):
 		if (len(career.description) > 0):
 			res += career.description+'\n'
 		res += self.profile2string(career.profile)+'\n'
-		res += "Compétences ("+str(len(career.skills))+"): "
+		res += "Compétences("+str(len(career.skills))+"): "
 		for item in career.skills:
-			if item.__class__.__name__ == 'Skill':
-				res += self.skill2string(item)+", "
-			else:
-				for skill in item:
-					res += self.skill2string(skill)+" ou "
-				res = res[:-4]+", "
+			res += self.skill2string(item)+", "
 		if len(career.skills) is 0:
 			res += "Aucune"
 		else:
 			res = res[:-2]
 		res += '\n'
-		res += "Talents ("+str(len(career.talents))+"): "
-		for id_ in career.talents:
-			talent = self.TALENTS[id_]
-			res += self.talent2string(talent)
+		res += "Talents("+str(len(career.talents))+"): "
+		for item in career.talents:
+			res += self.talent2string(item)+", "
 		if len(career.talents) is 0:
 			res += "Aucun"
+		else:
+			res = res[:-2]
 		res += '\n'
 		return _tostring(res)
 

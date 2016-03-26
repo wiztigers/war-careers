@@ -17,11 +17,12 @@ class Source(object):
 		self.page = page
 
 class Skill(object):
-	def __init__(self, id_, label, trait=None, description=None, specialized=False, speciality=None, advanced=False):
+	def __init__(self, id_, label, trait=None, description=None, source=None, specialized=False, speciality=None, advanced=False):
 		self.id_  = id_
 		self.label = label
 		self.trait = trait
 		self.description = description or "";
+		self.source = source
 		self.specialized = specialized or (speciality is not None)
 		self.speciality = speciality or []
 		if isinstance(self.trait, list):
@@ -34,10 +35,11 @@ class Skill(object):
 
 
 class Talent(object):
-	def __init__(self, id_, label, description=None, modifiers=None, specialized=False, speciality=None):
+	def __init__(self, id_, label, description=None, source=None, modifiers=None, specialized=False, speciality=None):
 		self.id_  = id_
 		self.label = label
 		self.description = "" or description;
+		self.source = source
 		self.specialized = specialized or (speciality is not None)
 		self.speciality = speciality or []
 		self.modifiers = modifiers or []

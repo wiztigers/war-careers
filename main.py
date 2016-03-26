@@ -30,8 +30,7 @@ for talent in TALENT_LIST:
 	if double_check(TALENTS, talent, 'talent'):
 		TALENTS[talent.id_] = talent
 
-def clone_skill(skill, speciality=None):
-	print("clone("+str(skill)+")")
+def clone(skill, speciality=None):
 	clone = deepcopy(skill)
 	if clone.specialized:
 		clone.speciality = []
@@ -40,40 +39,53 @@ def clone_skill(skill, speciality=None):
 		clone.specialized = True
 	return clone
 
-def load_skills(career, s):
-	if type(s) is list:
-		print(s.__class__.__name__)
-		clones = []
-		for id_ in s:
-			skill = existence_check(SKILLS,  "skill", career, id_)
-			clones.append(clone_skill(skill))
-		return [clones]
-	elif type(s) is dict:
-		print(s.__class__.__name__)
-		clones = []
-		for id_,speciality in s.items():
-			print(id_+":"+speciality)
-			skill = existence_check(SKILLS,  "skill", career, id_)
-			clones.append(clone_skill(skill, speciality))
-		return [clones]
+def append(clones, found, id_, message):
+	if found is not None:
+		clones.append(clone(found))
 	else:
-		print(s.__class__.__name__)
-		# skills is a str id
-		skill = existence_check(SKILLS,  "skill", career, s)
-		if skill is not None:
-			return [clone_skill(skill)]
-		return []
+		print("ERROR: "+message+" \""+id_+"\" not found")
+
+from tostring import _isstring
+def load(table, message, career, o):
+	clones = []
+	if type(o) is list:
+		for id_ in o:
+			clones += load(table,message, career, id_)
+		return [clones]
+	elif type(o) is dict:
+		for id_,speciality in o.items():
+			found = existence_check(table,message, career, id_)
+			if found is not None:
+				if type(speciality) is list:
+					for spe in speciality:
+						clones.append(clone(found, spe))
+				else:
+					clones.append(clone(found, speciality))
+			else:
+				print("ERROR: "+message+" \""+id_+"\" not found")
+		return [clones]
+	elif _isstring(o):
+		found = existence_check(table,message, career, o)
+		append(clones, found, o, message)
+		return clones
+	else:
+		print("ERROR: unsupported type for "+type(o).__name__)
+
+def load_tables(career):
+	tmp = []
+	for o in career.skills:
+		tmp += load(SKILLS,"skill", career, o)
+	career.skills = tmp
+	tmp = []
+	for o in career.talents:
+		tmp += load(TALENTS,"talent", career, o)
+	career.talents = tmp
 
 from table_careers import CAREER_LIST
 CAREERS = OrderedDict()
 for career in CAREER_LIST:
 	if double_check(CAREERS, career, 'career'):
-		print(career.label)
-		skills = []
-		for s in career.skills:
-			skills += load_skills(career, s)
-		career.skills = skills
-		print(str(skills))
+		load_tables(career)
 		CAREERS[career.id_] = career
 
 
@@ -81,8 +93,6 @@ for career in CAREER_LIST:
 from table_skills import SKILL_LIST
 
 def validate_career(career):
-	for id_ in career.talents:
-		existence_check(TALENTS,"talent", career, id_)
 	for id_ in career.before:
 		existence_check(CAREERS,"before", career, id_)
 	for id_ in career.after:
@@ -94,10 +104,21 @@ from tostring import ConsoleToString, PythonToString
 if __name__ == '__main__':
 	writer = ConsoleToString(SKILLS, TALENTS, CAREERS)
 	for k,v in SKILLS.items():
-		print("Compétence: "+writer.tostring(v))
+		continue
+#		print("Compétence: "+writer.tostring(v))
 	for k,v in TALENTS.items():
-		print("Talent: "+writer.tostring(v))
+		continue
+#		print("Talent: "+writer.tostring(v))
 	for k,v in CAREERS.items():
 		validate_career(v)
 		print("Carrière: "+writer.tostring(v))
+
+#	print("----------")
+#	with open('WH2-carrières.html') as f:
+#		contents = f.read()
+#	from bshtmlparse import parse_html
+#	CAREERS = parse_html(contents)
+#	writer = PythonToString(SKILLS, TALENTS, CAREERS)
+#	for k,v in CAREERS.items():
+#		print(writer.tostring(v))
 
