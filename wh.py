@@ -5,17 +5,26 @@ from tostring import ConsoleToString
 from collections import OrderedDict
 
 SOURCES = {
-	'core': "Warhammer (2nde édition)",
-	'comp': "Le Compagnon (2nde édition)",
-	'magi': "Les Royaumes de sorcellerie (2nde édition)",
-	'sigm': "Les Héritiers de Sigmar (2nde édition)",
-	'glac': "La Reine des Glaces (2nde édition)",
+	'core': ("Warhammer", 2),
+	'comp': ("Le Compagnon", 2),
+	'magi': ("Les Royaumes de sorcellerie", 2),
+	'sigm': ("Les Héritiers de Sigmar", 2),
+	'glac': ("La Reine des Glaces", 2),
 }
 
 class Source(object):
-	def __init__(self, document, page):
+	def __init__(self, document, edition, page):
 		self.document = document
+		self.edition = edition
 		self.page = page
+	def get_edition(self):
+		if self.edition is 1:
+			return "1ère édition"
+		if self.edition is 2:
+			return "2nde édition"
+		if self.edition is 3:
+			return "3ème édition"
+		raise Exception("Unsupported edition format: "+self.edition)
 
 class Skill(object):
 	def __init__(self, id_, label, trait=None, description=None, source=None, specialized=False, speciality=None, advanced=False):

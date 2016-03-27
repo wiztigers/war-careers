@@ -131,7 +131,7 @@ class ConsoleToString(object):
 		return _tostring(res)
 
 	def source2string(self, source):
-		return "[%s, page %s]"%(source.document, source.page)
+		return "[%s (%s), page %s]"%(source.document, source.get_edition(), source.page)
 
 	def profile2string(self, profile):
 		res = ''
@@ -171,7 +171,7 @@ class PythonToString(object):
 		return res+"),\n"
 
 	def source2string(self, source):
-		return 'Source("%s", %s)'%(source.document, source.page)
+	return 'Source("%s", %s)'%(source.document, source.get_edition(), source.page)
 
 	def profile2string(self, profile):
 		res = "{ "
