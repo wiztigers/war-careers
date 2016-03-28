@@ -94,9 +94,15 @@ from table_skills import SKILL_LIST
 
 def validate_career(career):
 	for id_ in career.before:
-		existence_check(CAREERS,"before", career, id_)
+		other = existence_check(CAREERS,"before", career, id_)
+		if other is not None:
+			if career.id_ not in other.after:
+				print("ERROR: shouldn't \""+career.label+"\"["+career.id_+"] be added after \""+other.label+"\" ["+id_+"]?")
 	for id_ in career.after:
-		existence_check(CAREERS, "after", career, id_)
+		other = existence_check(CAREERS, "after", career, id_)
+		if other is not None:
+			if career.id_ not in other.before:
+				print("ERROR: shouldn't \""+career.label+"\"["+career.id_+"] be added before \""+other.label+"\" ["+id_+"]?")
 
 
 from tostring import ConsoleToString, PythonToString
@@ -109,7 +115,7 @@ if __name__ == '__main__':
 #		print("Talent: "+writer.tostring(v))
 	for k,v in CAREERS.items():
 		validate_career(v)
-		print("Carrière: "+writer.tostring(v))
+		#print("Carrière: "+writer.tostring(v))
 
 #	print("----------")
 #	with open('WH2-carrières.html') as f:
