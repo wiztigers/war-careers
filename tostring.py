@@ -144,6 +144,51 @@ class ConsoleToString(object):
 
 
 
+class AsciidocToString(object):
+	def __init__(self, skills, talents, careers):
+		self.SKILLS  = skills
+		self.TALENTS = talents
+		self.CAREERS = careers
+
+	def tostring(self, x, short=False):
+		if short:
+			return self.short2string(x)
+		if x.__class__.__name__ == 'Skill':
+			return self.skill2string(x)
+		if x.__class__.__name__ == 'Talent':
+			return self.talent2string(x)
+		if x.__class__.__name__ == 'Career':
+			return self.career2string(x)
+		if x.__class__.__name__ == 'Source':
+			return self.source2string(x)
+		raise Exception("Unsupported type "+x.__class__.__name__)
+
+	def short2string(self, x):
+		return _tostring("<<%s,%s>>"%(x.id_,x.label))
+
+	def career2string(self, career):
+		res = "[[%s,%s]]\n"%(career.id_,career.label)
+		res += "%s\n%s\n"%(career.label.upper(),"-"*len(career.label))
+		res += "_Type:_ carrière "
+		if career.advanced:
+			res += "avancée +\n"
+		else:
+			res += "de base +\n"
+		res += "_Source:_ %s\n"%(self.source2string(career.source))
+		res += "_Accès:_"
+		for c in career.before:
+			res += " %s,"%(self.short2string(self.CAREERS[c]))
+		res = res[:-1]+". +\n"
+		res += "_Débouchés:_"
+		for c in career.after:
+			res += " %s,"%(self.short2string(self.CAREERS[c]))
+		res = res[:-1]+".\n"
+		return res
+
+	def source2string(self, source):
+		return "%s (%s), page %s"%(source.document,source.get_edition(),source.page)
+
+
 class PythonToString(object):
 	def __init__(self, skills, talents, careers):
 		self.SKILLS  = skills

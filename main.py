@@ -107,17 +107,17 @@ def validate_career(career):
 				#print("ERROR: shouldn't \""+career.label+"\"["+career.id_+"] be added before \""+other.label+"\" ["+id_+"]?")
 
 
-from tostring import ConsoleToString, PythonToString
+from tostring import AsciidocToString, PythonToString
 
 if __name__ == '__main__':
-	writer = ConsoleToString(SKILLS, TALENTS, CAREERS)
+	writer = AsciidocToString(SKILLS, TALENTS, CAREERS)
 #	for k,v in SKILLS.items():
 #		print("Compétence: "+writer.tostring(v))
 #	for k,v in TALENTS.items():
 #		print("Talent: "+writer.tostring(v))
 	for k,v in CAREERS.items():
 		validate_career(v)
-		print("Carrière: "+writer.tostring(v))
+		print(writer.tostring(v))
 
 #	print("----------")
 #	with open('WH2-carrières.html') as f:
