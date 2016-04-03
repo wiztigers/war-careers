@@ -5,11 +5,11 @@ from tostring import ConsoleToString
 from collections import OrderedDict
 
 SOURCES = {
-	'core': ("Warhammer", 2),
-	'comp': ("Le Compagnon", 2),
-	'magi': ("Les Royaumes de sorcellerie", 2),
-	'sigm': ("Les Héritiers de Sigmar", 2),
-	'glac': ("La Reine des Glaces", 2),
+	'core': "Warhammer",
+	'comp': "Le Compagnon",
+	'magi': "Les Royaumes de sorcellerie",
+	'sigm': "Les Héritiers de Sigmar",
+	'glac': "La Reine des Glaces",
 }
 
 class Source(object):
@@ -17,6 +17,8 @@ class Source(object):
 		self.document = document
 		self.edition = edition
 		self.page = page
+	def get_document(self):
+		return SOURCES[self.document]
 	def get_edition(self):
 		if self.edition is 1:
 			return "1ère édition"

@@ -166,6 +166,26 @@ class AsciidocToString(object):
 	def short2string(self, x):
 		return _tostring("<<%s,%s>>"%(x.id_,x.label))
 
+	def skillortalent2string(self, x):
+		if x.__class__.__name__ == 'Skill' or x.__class__.__name__ == 'Talent':
+			res = self.short2string(x)
+			if x.specialized:
+				if len(x.speciality) is 0:
+					specs = "au choix"
+				else:
+					specs = ""
+					for s in x.speciality:
+						specs += "%s, "%(s)
+					specs = specs[:-2]
+				res = "%s(%s)"%(res, specs)
+			return res
+		if x.__class__ is list:
+			res = ""
+			for e in x:
+				res += "%s ou "%(self.skillortalent2string(e))
+			return res[:-4]
+		raise Exception("Unsupported Skill or Talent type: %s"%(x.__class__.__name__))
+
 	def career2string(self, career):
 		res = "[[%s,%s]]\n"%(career.id_,career.label)
 		res += "%s\n%s\n"%(career.label.upper(),"-"*len(career.label))
@@ -175,18 +195,32 @@ class AsciidocToString(object):
 		else:
 			res += "de base +\n"
 		res += "_Source:_ %s\n"%(self.source2string(career.source))
-		res += "_Accès:_"
-		for c in career.before:
-			res += " %s,"%(self.short2string(self.CAREERS[c]))
+		res += "_Compétences (_ %s _):_"%(len(career.skills))
+		for e in career.skills:
+			res += " %s,"%(self.skillortalent2string(e))
 		res = res[:-1]+". +\n"
+		res += "_Talents (_ %s _):_"%(len(career.talents))
+		for e in career.talents:
+			res += " %s,"%(self.skillortalent2string(e))
+		res = res[:-1]+". +\n"
+		res += "_Accès:_"
+		if len(career.before) is 0:
+			res += "Aucun. +\n"
+		else:
+			for c in career.before:
+				res += " %s,"%(self.short2string(self.CAREERS[c]))
+			res = res[:-1]+". +\n"
 		res += "_Débouchés:_"
-		for c in career.after:
-			res += " %s,"%(self.short2string(self.CAREERS[c]))
-		res = res[:-1]+".\n"
+		if len(career.after) is 0:
+			res += "Aucun.\n"
+		else:
+			for c in career.after:
+				res += " %s,"%(self.short2string(self.CAREERS[c]))
+			res = res[:-1]+".\n"
 		return res
 
 	def source2string(self, source):
-		return "%s (%s), page %s"%(source.document,source.get_edition(),source.page)
+		return "%s (%s), page %s"%(source.get_document(),source.get_edition(),source.page)
 
 
 class PythonToString(object):
