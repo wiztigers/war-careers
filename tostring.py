@@ -186,6 +186,19 @@ class AsciidocToString(object):
 			return res[:-4]
 		raise Exception("Unsupported Skill or Talent type: %s"%(x.__class__.__name__))
 
+	def profile2string(self, profile):
+		res = '[width="50%",cols="8*4^,1,8*4^",options="header"]\n|================================================================\n'
+		for k in profile.keys():
+			res += '|{:3}'.format(k)
+		res += '\n'
+		for v in profile.values():
+			if v is not 0:
+				res += '| {:<2}'.format(v)
+			else:
+				res += '|   '
+		res += '\n|================================================================\n'
+		return res
+
 	def career2string(self, career):
 		res = "[[%s,%s]]\n"%(career.id_,career.label)
 		res += "%s\n%s\n"%(career.label.upper(),"-"*len(career.label))
@@ -195,6 +208,7 @@ class AsciidocToString(object):
 		else:
 			res += "de base +\n"
 		res += "_Source:_ %s\n"%(self.source2string(career.source))
+		res += self.profile2string(career.profile)
 		res += "_Compétences (_ %s _):_"%(len(career.skills))
 		for e in career.skills:
 			res += " %s,"%(self.skillortalent2string(e))
