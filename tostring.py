@@ -186,8 +186,38 @@ class AsciidocToString(object):
 			return res[:-4]
 		raise Exception("Unsupported Skill or Talent type: %s"%(x.__class__.__name__))
 
+	def skill2string(self, skill):
+		res = "[[%s,%s]]\n"%(skill.id_,skill.label)
+		res += ".%s\n"%(skill.label)
+		res += "_Type:_ compétence "
+		if skill.advanced:
+			res += "avancée +\n"
+		else:
+			res += "de base +\n"
+		res += "_Caractéristique:_ %s +\n"%(self.traits2string(skill))
+		res += "_Description:_ %s +\n"%(skill.description)
+		if skill.source is not None:
+			res += "_Source:_ %s +\n"%(self.source2string(skill.source))
+		return res
+
+	def talent2string(self, talent):
+		res = "[[%s,%s]]\n"%(talent.id_,talent.label)
+		res += ".%s\n"%(talent.label)
+		res += "_Description:_ %s +\n"%(talent.description)
+		if talent.source is not None:
+			res += "_Source:_ %s +\n"%(self.source2string(talent.source))
+		return res
+
+	def traits2string(self, skill):
+		if type(skill.trait) is list:
+			res = ""
+			for i in range(len(skill.trait)):
+				res += "%s(%s), "%(skill.speciality[i], skill.trait[i])
+			return res[:-2]
+		return _tostring(skill.trait)
+
 	def profile2string(self, profile):
-		res = '[width="50%",cols="8*4^,1,8*4^",options="header"]\n|================================================================\n'
+		res = '[width="50%",cols="8*4^,8*4^",options="header"]\n|================================================================\n'
 		for k in profile.keys():
 			res += '|{:3}'.format(k)
 		res += '\n'

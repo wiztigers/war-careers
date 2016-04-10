@@ -111,12 +111,19 @@ from tostring import AsciidocToString, PythonToString
 
 if __name__ == '__main__':
 	writer = AsciidocToString(SKILLS, TALENTS, CAREERS)
-#	for k,v in SKILLS.items():
-#		print("Compétence: "+writer.tostring(v))
-#	for k,v in TALENTS.items():
-#		print("Talent: "+writer.tostring(v))
+	advanced = False
+	print("\nCARRIÈRES DE BASE\n-----------------\n\n")
 	for k,v in CAREERS.items():
 		validate_career(v)
+		if not advanced and v.advanced:
+			print("\nCARRIÈRES AVANCÉES\n------------------\n\n")
+			advanced = True
+		print(writer.tostring(v))
+	print("\nCOMPÉTENCES\n-----------\n\n")
+	for k,v in SKILLS.items():
+		print(writer.tostring(v))
+	print("\nTALENTS\n-------\n\n")
+	for k,v in TALENTS.items():
 		print(writer.tostring(v))
 
 #	print("----------")
