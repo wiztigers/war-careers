@@ -163,12 +163,15 @@ class AsciidocToString(object):
 			return self.source2string(x)
 		raise Exception("Unsupported type "+x.__class__.__name__)
 
-	def short2string(self, x):
-		return _tostring("<<%s,%s>>"%(x.id_,x.label))
+	def short2string(self, x, prefix=''):
+		return _tostring("<<%s%s,%s>>"%(prefix,x.id_,x.label))
 
 	def skillortalent2string(self, x):
 		if x.__class__.__name__ == 'Skill' or x.__class__.__name__ == 'Talent':
-			res = self.short2string(x)
+			if x.__class__.__name__ == 'Skill':
+				res = self.short2string(x,'z')
+			else:
+				res = self.short2string(x)
 			if x.specialized:
 				if len(x.speciality) is 0:
 					specs = "au choix"
@@ -187,7 +190,7 @@ class AsciidocToString(object):
 		raise Exception("Unsupported Skill or Talent type: %s"%(x.__class__.__name__))
 
 	def skill2string(self, skill):
-		res = "[[%s,%s]]\n"%(skill.id_,skill.label)
+		res = "[[z%s,%s]]\n"%(skill.id_,skill.label)
 		res += ".%s\n"%(skill.label)
 		res += "_Type:_ compétence "
 		if skill.advanced:
