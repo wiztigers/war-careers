@@ -108,9 +108,10 @@ def validate_career(career):
 
 
 from tostring import AsciidocToString, PythonToString
+from wh import TRAITS
 
 if __name__ == '__main__':
-	writer = AsciidocToString(SKILLS, TALENTS, CAREERS)
+	writer = AsciidocToString(SKILLS, TALENTS, CAREERS, TRAITS)
 	advanced = False
 	print("\nCARRIÈRES DE BASE\n-----------------\n\n")
 	for k,v in CAREERS.items():

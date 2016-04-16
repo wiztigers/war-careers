@@ -17,10 +17,11 @@ def _isstring(o):
 		return type(o) is unicode
 
 class ConsoleToString(object):
-	def __init__(self, skills, talents, careers):
+	def __init__(self, skills, talents, careers, traits):
 		self.SKILLS  = skills
 		self.TALENTS = talents
 		self.CAREERS = careers
+		self.TRAITS  = traits
 
 	def tostring(self, x):
 		if x.__class__.__name__ == 'Skill':
@@ -144,11 +145,14 @@ class ConsoleToString(object):
 
 
 
+
+
 class AsciidocToString(object):
-	def __init__(self, skills, talents, careers):
+	def __init__(self, skills, talents, careers, traits):
 		self.SKILLS  = skills
 		self.TALENTS = talents
 		self.CAREERS = careers
+		self.TRAITS  = traits
 
 	def tostring(self, x, short=False):
 		if short:
@@ -217,14 +221,31 @@ class AsciidocToString(object):
 			for i in range(len(skill.trait)):
 				res += "%s(%s), "%(skill.speciality[i], skill.trait[i])
 			return res[:-2]
-		return _tostring(skill.trait)
+		trait = self.asTrait(skill.trait)
+		return _tostring("%s(%s)"%(trait.label,trait.id_))
+
+	def asTrait(self, tid):
+		for trait in self.TRAITS:
+			if trait.id_ is tid:
+				return trait
+		raise Exception('Trait "%s" does not exist'%(tid))
 
 	def profile2string(self, profile):
-		res = '[width="50%",cols="8*4^,8*4^",options="header"]\n|================================================================\n'
+		res = '[width="50%",cols="8*4^,1,8*4^",options="header"]\n|================================================================\n'
+		primary = True
 		for k in profile.keys():
+			trait = self.asTrait(k)
+			if primary and not trait.primary:
+				res += '|'
+				primary = False
 			res += '|{:3}'.format(k)
 		res += '\n'
-		for v in profile.values():
+		primary = True
+		for k,v in profile.items():
+			trait = self.asTrait(k)
+			if primary and not trait.primary:
+				res += '|'
+				primary = False
 			if v is not 0:
 				res += '| {:<2}'.format(v)
 			else:
@@ -271,10 +292,11 @@ class AsciidocToString(object):
 
 
 class PythonToString(object):
-	def __init__(self, skills, talents, careers):
+	def __init__(self, skills, talents, careers, traits):
 		self.SKILLS  = skills
 		self.TALENTS = talents
 		self.CAREERS = careers
+		self.TRAITS  = traits
 
 	def tostring(self, x):
 		if x.__class__.__name__ == 'Career':
