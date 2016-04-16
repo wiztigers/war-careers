@@ -273,14 +273,14 @@ class AsciidocToString(object):
 		res = res[:-1]+". +\n"
 		res += "_Accès:_"
 		if len(career.before) is 0:
-			res += "Aucun. +\n"
+			res += " Aucun. +\n"
 		else:
 			for c in career.before:
 				res += " %s,"%(self.short2string(self.CAREERS[c]))
 			res = res[:-1]+". +\n"
 		res += "_Débouchés:_"
 		if len(career.after) is 0:
-			res += "Aucun.\n"
+			res += " Aucun.\n"
 		else:
 			for c in career.after:
 				res += " %s,"%(self.short2string(self.CAREERS[c]))
