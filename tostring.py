@@ -231,6 +231,7 @@ class AsciidocToString(object):
 		raise Exception('Trait "%s" does not exist'%(tid))
 
 	def profile2string(self, profile):
+		promotions = 0
 		res = '[width="50%",cols="8*4^,1,8*4^",options="header"]\n|================================================================\n'
 		primary = True
 		for k in profile.keys():
@@ -250,8 +251,12 @@ class AsciidocToString(object):
 				res += '| {:<2}'.format(v)
 			else:
 				res += '|   '
+			if trait.primary:
+				promotions += int(v/5)
+			else:
+				promotions += v
 		res += '\n|================================================================\n'
-		return res
+		return res, promotions
 
 	def career2string(self, career):
 		res = "[[%s,%s]]\n"%(career.id_,career.label)
@@ -262,7 +267,9 @@ class AsciidocToString(object):
 		else:
 			res += "de base +\n"
 		res += "_Source:_ %s\n"%(self.source2string(career.source))
-		res += self.profile2string(career.profile)
+		profilestr,promotions = self.profile2string(career.profile)
+		res += profilestr
+		res += "_Promotions:_ %s +\n"%(promotions)
 		res += "_Compétences (_ %s _):_"%(len(career.skills))
 		for e in career.skills:
 			res += " %s,"%(self.skillortalent2string(e))
