@@ -92,19 +92,27 @@ for career in CAREER_LIST:
 
 from table_skills import SKILL_LIST
 
+def add_career_to(table,message, career,o):
+	if type(o) is list:
+		for e in o:
+			add_career_to(table,message, career,e)
+	else:
+		e = existence_check(table,message, career, o.id_)
+		e.careers.append(career.id_)
+
 def validate_career(career):
 	for id_ in career.before:
 		other = existence_check(CAREERS,"before", career, id_)
 		if other is not None:
 			if career.id_ not in other.after:
 				other.after.append(career.id_)
-				#print("ERROR: shouldn't \""+career.label+"\"["+career.id_+"] be added after \""+other.label+"\" ["+id_+"]?")
 	for id_ in career.after:
 		other = existence_check(CAREERS, "after", career, id_)
 		if other is not None:
 			if career.id_ not in other.before:
 				other.before.append(career.id_)
-				#print("ERROR: shouldn't \""+career.label+"\"["+career.id_+"] be added before \""+other.label+"\" ["+id_+"]?")
+	for t in career.talents:
+		add_career_to(TALENTS,"talent",career, t)
 
 
 from tostring import AsciidocToString, PythonToString
