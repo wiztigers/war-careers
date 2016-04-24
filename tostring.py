@@ -205,6 +205,12 @@ class AsciidocToString(object):
 		res += "_Description:_ %s +\n"%(skill.description)
 		if skill.source is not None:
 			res += "_Source:_ %s +\n"%(self.source2string(skill.source))
+		if len(skill.careers) > 0:
+			res += "_Possédé par:_"
+			for id_ in skill.careers:
+				career = self.CAREERS[id_]
+				res += " %s,"%(self.short2string(career))
+			res = res[:-1]+". +\n"
 		return res
 
 	def talent2string(self, talent):

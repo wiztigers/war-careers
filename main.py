@@ -111,6 +111,8 @@ def validate_career(career):
 		if other is not None:
 			if career.id_ not in other.before:
 				other.before.append(career.id_)
+	for t in career.skills:
+		add_career_to(SKILLS, "skill", career, t)
 	for t in career.talents:
 		add_career_to(TALENTS,"talent",career, t)
 
